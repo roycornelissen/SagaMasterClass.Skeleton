@@ -44,6 +44,9 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="OrderAbandoned.cs" />
+    <Compile Include="OrderCanceled.cs" />
+    <Compile Include="OrderPlaced.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

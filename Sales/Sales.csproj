@@ -65,6 +65,7 @@
     <Compile Include="Messages\IOrderCommand.cs" />
     <Compile Include="Messages\PlaceOrder.cs" />
     <Compile Include="Messages\StartOrder.cs" />
+    <Compile Include="OrderPolicy.cs" />
     <Compile Include="Program.cs" />
   </ItemGroup>
   <ItemGroup>
