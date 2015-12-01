@@ -1,6 +1,7 @@
 ﻿namespace Shipping
 {
     using Billing.Contracts;
+    using Contracts;
     using Messages;
     using NServiceBus;
     using NServiceBus.Saga;
@@ -51,6 +52,7 @@
 
         public void Handle(ShipOrderResponse message)
         {
+            Bus.Publish<OrderShipped>(e => e.OrderId = Data.OrderId);
             MarkAsComplete();
         }
     }

@@ -44,7 +44,8 @@ namespace Sales
             Bus.Publish(new OrderPlaced
             {
                 OrderId = message.OrderId,
-                CustomerId = message.OrderId
+                CustomerId = message.CustomerId,
+                Amount = message.OrderValue
             });
             MarkAsComplete();
         }

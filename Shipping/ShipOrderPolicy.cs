@@ -3,21 +3,23 @@
 namespace Shipping
 {
     using Contracts;
+    using Contracts.FedEx;
+    using Contracts.Ups;
     using Messages;
     using NServiceBus;
     using NServiceBus.Saga;
     using NServiceBus.Timeout.Core;
-    using ShipOrder = Messages.ShipOrder;
 
     public class ShipOrderPolicy: Saga<ShipOrderPolicy.SagaData>,
         IAmStartedByMessages<ShipOrder>,
-        IHandleMessages<ShipFinalOrderResponse>,
-        IHandleTimeouts<ShipOrderPolicy.RetryGatewayCall>
+        IHandleMessages<ShipFinalOrderResponse>
     {
         public class SagaData : ContainSagaData
         {
             [Unique]
             public virtual string OrderId { get; set; }
+
+            public virtual bool TriedFallback { get; set; }
         }
 
         public class RetryGatewayCall : TimeoutData
@@ -27,19 +29,16 @@ namespace Shipping
         public void Handle(ShipOrder message)
         {
             Data.OrderId = message.OrderId;
-
             Console.Out.WriteLine($"Order {message.OrderId} is shipping");
+            ShipOrder(new ShipFinalOrderFedex());
 
-            ShipOrder("FedEx");
+            //todo: should set timeout for when FedEx never comes back (i.e. command ends up in error queue)
         }
 
-        void ShipOrder(string provider)
+        void ShipOrder(ShipFinalOrder command)
         {
-            Bus.Send(new ShipFinalOrder
-            {
-                OrderId = Data.OrderId,
-                Provider = provider
-            });
+            command.OrderId = Data.OrderId;
+            Bus.Send(command);
         }
 
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
@@ -56,16 +55,19 @@ namespace Shipping
                     Success = message.Success
                 });
                 MarkAsComplete();
+                return;
+            }
+
+            if (Data.TriedFallback)
+            {
+                Data.TriedFallback = false;
+                ShipOrder(new ShipFinalOrderFedex());
             }
             else
             {
-                RequestTimeout<RetryGatewayCall>(TimeSpan.FromSeconds(20));
+                Data.TriedFallback = true;
+                ShipOrder(new ShipFinalOrderUps());
             }
-        }
-
-        public void Timeout(RetryGatewayCall state)
-        {
-            ShipOrder("FedEx");
         }
     }
 }

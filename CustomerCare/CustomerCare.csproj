@@ -60,6 +60,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PreferredCustomerPolicy.cs" />
     <Compile Include="Program.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -70,6 +71,10 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Billing.Contracts\Billing.Contracts.csproj">
+      <Project>{e978479d-347b-4b3e-8ec7-b08369b5eafe}</Project>
+      <Name>Billing.Contracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CustomerCare.Contracts\CustomerCare.Contracts.csproj">
       <Project>{75c8239c-e97d-4340-b6b3-b033b1fe5e02}</Project>
       <Name>CustomerCare.Contracts</Name>

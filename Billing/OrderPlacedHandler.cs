@@ -12,7 +12,12 @@
         public void Handle(OrderPlaced message)
         {
             Thread.Sleep(5000);
-            Bus.Publish<OrderBilled>(e => e.OrderId = message.OrderId);
+            Bus.Publish<OrderBilled>(e =>
+            {
+                e.OrderId = message.OrderId;
+                e.CustomerId = message.CustomerId;
+                e.Amount = message.Amount;
+            });
         }
     }
 }
