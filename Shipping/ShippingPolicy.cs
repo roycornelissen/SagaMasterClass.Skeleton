@@ -2,12 +2,14 @@
 {
     using Billing.Contracts;
     using Messages;
+    using NServiceBus;
     using NServiceBus.Saga;
     using Sales.Contracts;
 
     public class ShippingPolicy: Saga<ShippingPolicy.SagaData>,
         IAmStartedByMessages<OrderPlaced>,
-        IAmStartedByMessages<OrderBilled>
+        IAmStartedByMessages<OrderBilled>,
+        IHandleMessages<ShipOrderResponse>
     {
         public class SagaData : ContainSagaData
         {
@@ -35,8 +37,7 @@
         {
             if (Data.IsPlaced && Data.IsBilled)
             {
-                Bus.Send(new ShipOrder() { OrderId = Data.OrderId});
-                MarkAsComplete();
+                Bus.Send(new ShipOrder { OrderId = Data.OrderId});
             }
         }
 
@@ -46,6 +47,11 @@
             Data.IsBilled = true;
 
             CheckAndPublish();
+        }
+
+        public void Handle(ShipOrderResponse message)
+        {
+            MarkAsComplete();
         }
     }
 }
