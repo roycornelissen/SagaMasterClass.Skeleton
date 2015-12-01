@@ -11,6 +11,7 @@
     {
         public class SagaData : ContainSagaData
         {
+            [Unique]
             public virtual string OrderId { get; set; }
             public virtual  bool IsBilled { get; set; }
             public virtual bool IsPlaced { get; set; }
